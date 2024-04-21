@@ -1,4 +1,4 @@
-# Telegram-bot_for_traffic_predictions+query_recognition
+# Tg-bot_for_traffic_predictions+query_recognition
 ## ТГ бот проекта 
 https://t.me/MskSubwayBot
 ## Описание решения:
