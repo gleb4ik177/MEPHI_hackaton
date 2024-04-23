@@ -16,7 +16,7 @@ warnings.filterwarnings('ignore')
 def model_query(query : str):
     ret = {'station' : None, 'date' : None}
 
-    llama = LlamaAPI("LL-JAS1EJsZRdhCwIonyLuBxJN09FkIb9w67y99HCTE1OAVlSn4z9On80hpO6djvKkm")
+    llama = LlamaAPI(LLAMAAPI_TOKEN)
     api_request_json = {
     "messages": [
         {"role": "user", "content": 'пассажиропоток ' + query.lower()},

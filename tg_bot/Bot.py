@@ -3,10 +3,11 @@ import os
 from telebot import types
 from tg_services import model_query as mq, clean_date, df_traffic
 import pandas as pd
+import datetime as dt
 from cydifflib import get_close_matches
 
-df = pd.read_excel('api_for_web\data\stations.xlsx')
-bot = telebot.TeleBot('7152516720:AAEnyntL7rzcav5v7TG5XcWXsZoRSjjiJjM')
+df = pd.read_excel('tg_bot\data\stations.xlsx')
+bot = telebot.TeleBot(TG_BOT_TOKEN)
 
 @bot.message_handler(commands=['start'])
 def startBot(message):
@@ -53,19 +54,22 @@ def echo_all(message):
   if not all_good:
      bot.send_message(message.chat.id, 'модель не распознала запрос')
   else:   
-    bot.send_message(message.chat.id, f"<u>СТАНЦИЯ:</u> {station}\n" +\
-                                      f"<u>ИНТЕРВАЛ:</u> {ds} - {de}\n" +\
-                                      f"<u>СУММА:</u> {round(traffic_number.stream.sum())}\n" +\
-                                      f"<u>МИН:</u> {round(traffic_number.stream.min())}\n" +\
-                                      f"<u>МАКС:</u> {round(traffic_number.stream.max())}\n" +\
-                                      f"<u>СРЕД:</u> {round(traffic_number.stream.mean())}\n",parse_mode='html')
-    if len(traffic_number) >= 10:
-      img = open('graph.png', 'rb')
-      bot.send_photo(message.chat.id, img)
-    else:
-      s = ""
-      s+=("DATE            | TRAFFIC\n")
-      for i in traffic_number.index:
-        s+=(str(traffic_number.date[i])+" | "+str(round(traffic_number.stream[i])).rjust(7)+"\n")
-      bot.send_message(message.chat.id, s)
+    if dt.datetime.strptime(de, "%Y-%m-%d") < dt.datetime.strptime('2024-01-01', '%Y-%m-%d'):
+      bot.send_message(message.chat.id, 'по данной дате информации нет')
+    else:  
+      bot.send_message(message.chat.id, f"<u>СТАНЦИЯ:</u> {station}\n" +\
+                                        f"<u>ИНТЕРВАЛ:</u> {ds} - {de}\n" +\
+                                        f"<u>СУММА:</u> {round(traffic_number.stream.sum())}\n" +\
+                                        f"<u>МИН:</u> {round(traffic_number.stream.min())}\n" +\
+                                        f"<u>МАКС:</u> {round(traffic_number.stream.max())}\n" +\
+                                        f"<u>СРЕД:</u> {round(traffic_number.stream.mean())}\n",parse_mode='html')
+      if len(traffic_number) >= 10:
+        img = open('graph.png', 'rb')
+        bot.send_photo(message.chat.id, img)
+      else:
+        s = ""
+        s+=("DATE            | TRAFFIC\n")
+        for i in traffic_number.index:
+          s+=(str(traffic_number.date[i])+" | "+str(round(traffic_number.stream[i])).rjust(7)+"\n")
+        bot.send_message(message.chat.id, s)
 bot.infinity_polling()
